@@ -29,18 +29,18 @@ var zodiacSymbols = {
 };
 
 var zodiacSigns = {
-  Aries: { name: "", symbolCharacter: "♈" },
-  Taurus: { name: "", symbolCharacter: "♉" },
-  Gemini: { name: "", symbolCharacter: "♊" },
-  Cancer: { name: "", symbolCharacter: "♋" },
-  Leo: { name: "", symbolCharacter: "♌" },
-  Virgo: { name: "", symbolCharacter: "♍" },
-  Libra: { name: "", symbolCharacter: "♎" },
-  Scorpio: { name: "", symbolCharacter: "♏" },
-  Sagittarius: { name: "", symbolCharacter: "♐" },
-  Capricorn: { name: "", symbolCharacter: "♑" },
-  Aquarius: { name: "", symbolCharacter: "♒" },
-  Pisces: { name: "", symbolCharacter: "♓" }
+  Aries: { name: "", symbolCharacter: "♈", angle: 0 },
+  Taurus: { name: "", symbolCharacter: "♉", angle: 30 },
+  Gemini: { name: "", symbolCharacter: "♊", angle: 60 },
+  Cancer: { name: "", symbolCharacter: "♋", angle: 90 },
+  Leo: { name: "", symbolCharacter: "♌", angle: 120 },
+  Virgo: { name: "", symbolCharacter: "♍", angle: 150 },
+  Libra: { name: "", symbolCharacter: "♎", angle: 180 },
+  Scorpio: { name: "", symbolCharacter: "♏", angle: 210 },
+  Sagittarius: { name: "", symbolCharacter: "♐", angle: 240 },
+  Capricorn: { name: "", symbolCharacter: "♑", angle: 270 },
+  Aquarius: { name: "", symbolCharacter: "♒", angle: 300 },
+  Pisces: { name: "", symbolCharacter: "♓", angle: 330 }
 };
 
 var astralBodies = [
@@ -151,6 +151,7 @@ var astralBodies = [
 ];
 
 function onReady() {
+	zodiacSignsPrecalculate();
   astralBodyPrecalculate();
   astralBodyDegreeSignInputsPopulate();
   
@@ -172,14 +173,22 @@ function onReady() {
   
 }
 
+function zodiacSignsPrecalculate() {
+	for (var key in zodiacSigns) {
+    var value = zodiacSigns[key];
+		var degree = [value.angle, 0, 0];
+		value.degree = degree;
+	}
+}
+
 function astralBodyPrecalculate() {
-	var degreeInSeconds = 
+	var degreeInSeconds = 60 * 60;
 	astralBodies.forEach(function(value, index, array) {
 		var tomorrowSeconds = degreeToSeconds(value.tomorrow);
 		var todaySeconds = degreeToSeconds(value.today);
-		var speedSeconds = (tomorrowSeconds - todaySeconds)
-		value.speed = degreeFromSeconds(degreeToSeconds
-	}
+		var speedSeconds = (tomorrowSeconds - todaySeconds);
+		value.speed = degreeFromSeconds(Math.floor(speedSeconds / degreeInSeconds));
+	});
 }
 
 function astralBodyDegreeSignInputsPopulate() {
@@ -272,7 +281,7 @@ function degreeFromSeconds(degree) {
 	while (degree.length < 3) {
 		degree.unshift(0);
 	}
-	int seconds = 0;
+	var seconds = 0;
 	seconds += degree[0];
 	seconds *= 60;
 	seconds += degree[1];
