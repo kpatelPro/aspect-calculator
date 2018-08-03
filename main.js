@@ -1,46 +1,31 @@
-var zodiacSignNames = [
-  "Aries",
-  "Taurus",
-  "Gemini",
-  "Cancer",
-  "Leo",
-  "Virgo",
-  "Libra",
-  "Scorpio",
-  "Sagittarius",
-  "Capricorn",
-  "Aquarius",
-  "Pisces"
+var zodiacKeys = [
+  "ARI",
+  "TAU",
+  "GEM",
+  "CAN",
+  "LEO",
+  "VIR",
+  "LIB",
+  "SCO",
+  "SAG",
+  "CAP",
+  "AQU",
+  "PIS"
 ];
 
-var zodiacSymbols = {
-  ARI: "♈",
-  TAU: "♉",
-  GEM: "♊",
-  CAN: "♋",
-  LEO: "♌",
-  VIR: "♍",
-  LIB: "♎",
-  SCO: "♏",
-  SAG: "♐",
-  CAP: "♑",
-  AQU: "♒",
-  PIS: "♓"
-};
-
 var zodiacSigns = {
-  Aries: { name: "", symbolCharacter: "♈", angle: 0 },
-  Taurus: { name: "", symbolCharacter: "♉", angle: 30 },
-  Gemini: { name: "", symbolCharacter: "♊", angle: 60 },
-  Cancer: { name: "", symbolCharacter: "♋", angle: 90 },
-  Leo: { name: "", symbolCharacter: "♌", angle: 120 },
-  Virgo: { name: "", symbolCharacter: "♍", angle: 150 },
-  Libra: { name: "", symbolCharacter: "♎", angle: 180 },
-  Scorpio: { name: "", symbolCharacter: "♏", angle: 210 },
-  Sagittarius: { name: "", symbolCharacter: "♐", angle: 240 },
-  Capricorn: { name: "", symbolCharacter: "♑", angle: 270 },
-  Aquarius: { name: "", symbolCharacter: "♒", angle: 300 },
-  Pisces: { name: "", symbolCharacter: "♓", angle: 330 }
+  ARI: { name: "Aries", symbolCharacter: "♈", angle: 0 },
+  TAU: { name: "Taurus", symbolCharacter: "♉", angle: 30 },
+  GEM: { name: "Gemini", symbolCharacter: "♊", angle: 60 },
+  CAN: { name: "Cancer", symbolCharacter: "♋", angle: 90 },
+  LEO: { name: "Leo", symbolCharacter: "♌", angle: 120 },
+  VIR: { name: "Virgo", symbolCharacter: "♍", angle: 150 },
+  LIB: { name: "Libra", symbolCharacter: "♎", angle: 180 },
+  SCO: { name: "Scorpio", symbolCharacter: "♏", angle: 210 },
+  SAG: { name: "Sagittarius", symbolCharacter: "♐", angle: 240 },
+  CAP: { name: "Capricorn", symbolCharacter: "♑", angle: 270 },
+  AQU: { name: "Aquarius", symbolCharacter: "♒", angle: 300 },
+  PIS: { name: "Pisces", symbolCharacter: "♓", angle: 330 }
 };
 
 var astralBodies = [
@@ -161,16 +146,15 @@ function onReady() {
   // button handlers
 	$("#random").click(function(){
 		astralBodyDegreeSignInputsRandomize();
-  })
+  });
   $("#calculate").click(function(){
     $("#aspectInputs").hide();
     $("#aspectResults").show();
-  })
+  });
   $("#changeInputs").click(function(){
     $("#aspectInputs").show();
     $("#aspectResults").hide();
-  })
-  
+  });
 }
 
 function zodiacSignsPrecalculate() {
@@ -217,7 +201,7 @@ function astralBodyDegreeSignInputsPopulate() {
     tdDegree.append(degreeInputCreate('Seconds'+value.id));
     
     var tdSignSymbol = $('<td id="tdSign' + value.id + '"></td>');
-    var signSymbol = $('<div id="signSymbol' + value.id + '">' + zodiacSymbols["ARI"] + "</div>");
+    var signSymbol = $('<div id="signSymbol' + value.id + '">' + zodiacSigns["ARI"].symbolCharacter + "</div>");
 		tdSignSymbol.append(signSymbol);
     
     var tdSign = $('<td id="tdSign' + value.id + '"></td>');
@@ -235,7 +219,7 @@ function astralBodyDegreeSignInputsRandomize() {
 		$('#degreeHours' + value.id).val(randomRangeInt(0,24));
 		$('#degreeMinutes' + value.id).val(randomRangeInt(0,60));
 		$('#degreeSeconds' + value.id).val(randomRangeInt(0,60));
-		$('#sign' + value.id).val(zodiacSignIdFromName(randomFromArray(zodiacSignNames)));		
+		$('#sign' + value.id).val(randomFromArray(zodiacKeys));		
  		$('#sign' + value.id).change();
 	});
 }
@@ -251,22 +235,18 @@ function signInputCreate(id) {
   var selector = $(
     '<select id="sign' + id + '" class="signSelector" required></select>'
   );
-  zodiacSignNames.forEach(function(value, index, array) {
+  zodiacKeys.forEach(function(value, index, array) {
     var option = $(
-      '<option value="' + zodiacSignIdFromName(value) + '">' + value + "</option>"
+      '<option value="' + value + '">' + zodiacSigns[value].name + "</option>"
     );
     selector.append(option);
   });
   selector.change(function() {
-    $("#signSymbol" + id).text(zodiacSymbols[$(this).val()]);
+    $("#signSymbol" + id).text(zodiacSigns[$(this).val()].symbolCharacter);
   });
 
   div.append(selector);
   return div;
-}
-
-function zodiacSignIdFromName(name) {
-	return name.substr(0,3).toUpperCase();		
 }
 
 function degreeFromString(input) {
