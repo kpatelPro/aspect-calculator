@@ -28,6 +28,14 @@ var zodiacSigns = {
   PIS: { name: "Pisces", symbolCharacter: "♓", angle: 330 }
 };
 
+var auxiliaryBodies = [
+  {
+    id: "CUSP5",
+    name: "CUSP 5",
+    icon: ""
+  },
+];
+
 var astralBodies = [
   {
     id: "Sun",
@@ -109,6 +117,7 @@ var astralBodies = [
     icon:
       "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-pluto.png"
   },
+/*
   {
     id: "MeanNode",
     name: "Mean Node",
@@ -133,19 +142,20 @@ var astralBodies = [
     icon:
       "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-chiron.png"
   }
+*/
 ];
 
 function onReady() {
 	zodiacSignsPrecalculate();
   astralBodyPrecalculate();
-  astralBodyDegreeSignInputsPopulate();
+  degreeSignInputsPopulate();
   
   $("#aspectInputs").show();
   $("#aspectResults").hide();
   
   // button handlers
 	$("#random").click(function(){
-		astralBodyDegreeSignInputsRandomize();
+		degreeSignInputsRandomize();
   });
   $("#calculate").click(function(){
     $("#aspectInputs").hide();
@@ -175,8 +185,8 @@ function astralBodyPrecalculate() {
 	});
 }
 
-function astralBodyDegreeSignInputsPopulate() {
-  var table = $("#astralBodyDegreeSignInputs");
+function degreeSignInputsPopulate() {
+  var table = $("#degreeSignInputs");
 
   //header
   var tr = $("<tr></tr>");
@@ -189,39 +199,55 @@ function astralBodyDegreeSignInputsPopulate() {
   table.append(tr);
 
   //rows
-  astralBodies.forEach(function(value, index, array) {
-    var tr = $("<tr></tr>");
-    var tdIcon = $(
-      '<td><img id="icon' + value.id + '" src="' + value.icon + '"></img></td>'
-    );
-    var tdName = $("<td>" + value.name + "</td>");
-    var tdDegree = $('<td></td>');
-    tdDegree.append(degreeInputCreate('Hours'+value.id));
-    tdDegree.append(degreeInputCreate('Minutes'+value.id));
-    tdDegree.append(degreeInputCreate('Seconds'+value.id));
-    
-    var tdSignSymbol = $('<td id="tdSign' + value.id + '"></td>');
-    var signSymbol = $('<div id="signSymbol' + value.id + '">' + zodiacSigns["ARI"].symbolCharacter + "</div>");
-		tdSignSymbol.append(signSymbol);
-    
-    var tdSign = $('<td id="tdSign' + value.id + '"></td>');
-    //var tdSignInput=$('<input id="sign' + value.id + '" type="text" required>');
-    var tdSignInput = signInputCreate(value.id);
-    tdSign.append(tdSignInput);
-
-    tr.append(tdIcon, tdName, tdDegree, tdSignSymbol, tdSign);
+  auxiliaryBodies.forEach(function(value, index, array) {
+  	var tr = degreeSignInputsCreateRow(value.id, value.name, value.icon);
     table.append(tr);
-  });
+	});
+  astralBodies.forEach(function(value, index, array) {
+  	var tr = degreeSignInputsCreateRow(value.id, value.name, value.icon);
+    table.append(tr);
+	});
 }
 
-function astralBodyDegreeSignInputsRandomize() {
-	astralBodies.forEach(function(value, index, array) {
-		$('#degreeHours' + value.id).val(randomRangeInt(0,24));
-		$('#degreeMinutes' + value.id).val(randomRangeInt(0,60));
-		$('#degreeSeconds' + value.id).val(randomRangeInt(0,60));
-		$('#sign' + value.id).val(randomFromArray(zodiacKeys));		
- 		$('#sign' + value.id).change();
+function degreeSignInputsCreateRow(id, name, icon) {	
+	var tr = $("<tr></tr>");
+	var tdIcon = $(
+		'<td><img id="icon' + id + '" src="' + icon + '"></img></td>'
+	);
+	var tdName = $("<td>" + name + "</td>");
+	var tdDegree = $('<td></td>');
+	tdDegree.append(degreeInputCreate('Degrees'+id));
+	tdDegree.append(degreeInputCreate('Minutes'+id));
+	tdDegree.append(degreeInputCreate('Seconds'+id));
+	
+	var tdSignSymbol = $('<td id="tdSign' + id + '"></td>');
+	var signSymbol = $('<div id="signSymbol' + id + '">' + zodiacSigns["ARI"].symbolCharacter + "</div>");
+	tdSignSymbol.append(signSymbol);
+	
+	var tdSign = $('<td id="tdSign' + id + '"></td>');
+	//var tdSignInput=$('<input id="sign' + id + '" type="text" required>');
+	var tdSignInput = signInputCreate(id);
+	tdSign.append(tdSignInput);
+
+	tr.append(tdIcon, tdName, tdDegree, tdSignSymbol, tdSign);
+ 	return tr;
+}
+
+function degreeSignInputsRandomize() {
+	auxiliaryBodies.forEach(function(value, index, array) {
+		degreeSignInputsRowRandomize(value.id);
 	});
+	astralBodies.forEach(function(value, index, array) {
+		degreeSignInputsRowRandomize(value.id);
+	});
+}
+
+function degreeSignInputsRowRandomize(id) {
+		$('#degreeDegrees' + id).val(randomRangeInt(0,30));
+		$('#degreeMinutes' + id).val(randomRangeInt(0,60));
+		$('#degreeSeconds' + id).val(randomRangeInt(0,60));
+		$('#sign' + id).val(randomFromArray(zodiacKeys));		
+ 		$('#sign' + id).change();
 }
 
 function degreeInputCreate(id) {
