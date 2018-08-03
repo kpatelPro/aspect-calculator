@@ -216,9 +216,9 @@ function degreeSignInputsCreateRow(id, name, icon) {
 	);
 	var tdName = $("<td>" + name + "</td>");
 	var tdDegree = $('<td></td>');
-	tdDegree.append(degreeInputCreate('Degrees'+id));
-	tdDegree.append(degreeInputCreate('Minutes'+id));
-	tdDegree.append(degreeInputCreate('Seconds'+id));
+	tdDegree.append(degreeInputCreate('Degrees'+id, 30));
+	tdDegree.append(degreeInputCreate('Minutes'+id, 60));
+	tdDegree.append(degreeInputCreate('Seconds'+id, 60));
 	
 	var tdSignSymbol = $('<td id="tdSign' + id + '"></td>');
 	var signSymbol = $('<div id="signSymbol' + id + '">' + zodiacSigns["ARI"].symbolCharacter + "</div>");
@@ -233,25 +233,8 @@ function degreeSignInputsCreateRow(id, name, icon) {
  	return tr;
 }
 
-function degreeSignInputsRandomize() {
-	auxiliaryBodies.forEach(function(value, index, array) {
-		degreeSignInputsRowRandomize(value.id);
-	});
-	astralBodies.forEach(function(value, index, array) {
-		degreeSignInputsRowRandomize(value.id);
-	});
-}
-
-function degreeSignInputsRowRandomize(id) {
-		$('#degreeDegrees' + id).val(randomRangeInt(0,30));
-		$('#degreeMinutes' + id).val(randomRangeInt(0,60));
-		$('#degreeSeconds' + id).val(randomRangeInt(0,60));
-		$('#sign' + id).val(randomFromArray(zodiacKeys));		
- 		$('#sign' + id).change();
-}
-
-function degreeInputCreate(id) {
-	var $input = $('<input id="degree' + id + '" type="text" size="3" maxlength="3" required>');
+function degreeInputCreate(id, valueRange) {
+	var $input = $('<input id="degree' + id + '" type="number" min="0" max="' + (valueRange-1) + '" size="3" maxlength="3" required>');
 	return $input;
 }
 
@@ -273,6 +256,23 @@ function signInputCreate(id) {
 
   div.append(selector);
   return div;
+}
+
+function degreeSignInputsRandomize() {
+	auxiliaryBodies.forEach(function(value, index, array) {
+		degreeSignInputsRowRandomize(value.id);
+	});
+	astralBodies.forEach(function(value, index, array) {
+		degreeSignInputsRowRandomize(value.id);
+	});
+}
+
+function degreeSignInputsRowRandomize(id) {
+		$('#degreeDegrees' + id).val(randomRangeInt(0,30));
+		$('#degreeMinutes' + id).val(randomRangeInt(0,60));
+		$('#degreeSeconds' + id).val(randomRangeInt(0,60));
+		$('#sign' + id).val(randomFromArray(zodiacKeys));		
+ 		$('#sign' + id).change();
 }
 
 function degreeFromString(input) {
