@@ -161,7 +161,9 @@ var aspectAngles = [
 
 var aspectAnglesInSeconds = [];
 
-var kSecondsPerDegree = 60 * 60;
+var kSecondsPerMinute = 60;
+var kSecondsPerDegree = 1 * 60 * 60;
+var kSecondsPer180Degrees = 180 * 60 * 60;
 var kSecondsPer360Degrees = 360 * 60 * 60;
 
 var calculateData = {
@@ -170,9 +172,26 @@ var calculateData = {
 	aspectAnglesSecondsAdjusted : [],
 };
 
+// TEST DATA
+var testData_0 = {
+	CUSP5: 		{ sign: "PIS", position: [28,46,0] },
+	Sun: 			{ sign: "CAN", position: [17,36,17] },
+	Moon: 		{ sign: "GEM", position: [2,33,22] },
+	Mercury: 	{ sign: "LEO", position: [13,53,17] },
+	Venus: 		{ sign: "LEO", position: [29,45,13] },
+	Mars: 		{ sign: "AQU", position: [8,9,48] },
+	Jupiter: 	{ sign: "SCO", position: [13,20,43] },
+	Saturn: 	{ sign: "CAP", position: [4,57,31] },
+	Uranus: 	{ sign: "TAU", position: [2,13,31] },
+	Neptune:	{ sign: "PIS", position: [16,22,38] },
+	Pluto: 		{ sign: "CAP", position: [20,5,3] },
+	Chiron: 	{ sign: "ARI", position: [2,25,17] },
+	Asteroid2:{ sign: "PIS", position: [0,0,0] },
+}
+
 function onReady() {
 	zodiacSignsPrecalculate();
-  astralBodyPrecalculate();
+  //astralBodyPrecalculate();
   positionInputsPopulate();
   
   $("#aspectInputs").show();
@@ -180,10 +199,14 @@ function onReady() {
   
   // button handlers
 	$("#random").click(function(){
-		positionInputsRandomize();
+		positionInputsToTest(testData_0);
+		//positionInputsRandomize();
   });
   $("#calculate").click(function(){
+  	//calculateUnitTest(); return;
+  	
   	calculateWinner();
+    winnersPopulate();
     $("#aspectInputs").hide();
     $("#aspectResults").show();
   });
@@ -240,7 +263,7 @@ function positionInputsCreateRow(id, name, icon) {
 	var tdIcon = $(
 		'<td><img id="icon' + id + '" src="' + icon + '"></img></td>'
 	);
-	var tdName = $("<td>" + name + "</td>");
+	var tdName = $('<td id="name' + id + '">' + name + '</td>');
 	var tdDegree = $('<td></td>');
 	tdDegree.append(offsetInputCreate('Degrees'+id, 30));
 	tdDegree.append(offsetInputCreate('Minutes'+id, 60));
@@ -261,10 +284,12 @@ function positionInputsCreateRow(id, name, icon) {
 
 function positionInputsGet(id) {
 		var sign = $('#sign' + id).val();
-		var degrees = $('#offsetDegrees' + id).val();
-		var minutes = $('#offsetMinutes' + id).val();
-		var seconds = $('#offsetSeconds' + id).val();
-		var position = [sign, degrees, minutes, seconds];
+		var degrees = +$('#offsetDegrees' + id).val();
+		var minutes = +$('#offsetMinutes' + id).val();
+		var seconds = +$('#offsetSeconds' + id).val();
+		var position = [degrees, minutes, seconds];
+		//console.log(id + '- ' + sign + ' ' + degrees + ':' + minutes + ':' + seconds);
+    return position;
 }
 
 function offsetInputCreate(id, valueRange) {
@@ -292,16 +317,33 @@ function signInputCreate(id) {
   return div;
 }
 
-function positionInputsRandomize() {
+function positionInputsToTest(testData) {
 	auxiliaryBodies.forEach(function(value, index, array) {
-		positionInputsRowRandomize(value.id);
+		positionInputsToTestRow(value.id, testData);
 	});
 	astralBodies.forEach(function(value, index, array) {
-		positionInputsRowRandomize(value.id);
+		positionInputsToTestRow(value.id, testData);
 	});
 }
 
-function positionInputsRowRandomize(id) {
+function positionInputsToTestRow(id, testData) {
+		$('#offsetDegrees' + id).val(testData[id].position[0]);
+		$('#offsetMinutes' + id).val(testData[id].position[1]);
+		$('#offsetSeconds' + id).val(testData[id].position[2]);
+		$('#sign' + id).val(testData[id].sign);	
+ 		$('#sign' + id).change();
+}
+
+function positionInputsRandomize() {
+	auxiliaryBodies.forEach(function(value, index, array) {
+		positionInputsRandomizeRow(value.id);
+	});
+	astralBodies.forEach(function(value, index, array) {
+		positionInputsRandomizeRow(value.id);
+	});
+}
+
+function positionInputsRandomizeRow(id) {
 		$('#offsetDegrees' + id).val(randomRangeInt(0,30));
 		$('#offsetMinutes' + id).val(randomRangeInt(0,60));
 		$('#offsetSeconds' + id).val(randomRangeInt(0,60));
@@ -309,43 +351,156 @@ function positionInputsRowRandomize(id) {
  		$('#sign' + id).change();
 }
 
-function calculateWinner() {
-	// convert aspect angles into seconds
-	aspectAnglesInSeconds = [];
-	aspectAngles.forEach(function(value, index, array) {
-		var angle = value;
-		var angleInSeconds = positionToSeconds(angle);
-		apectAnglesInSeconds.push(angleInSeconds);
-	});
-
-	// recalculate all data	
-	calculateData = {};
-	// convert auxiliary body positions to seconds
-	calculateData.auxiliaryBodiesAnglesSeconds = {};
-	auxiliaryBodies.forEach(function(value, index, array) {
-			var position = positionInputsGet(value.id);
-			calculateData.auxiliaryBodiesAnglesSeconds[value.id] = positionToSeconds(position);
-	});
+function calculateUnitTest() {
+	//[30, 90, 30*60, 90*60, 30*60*60, 90*60*60];
+  [[0,1,30]].forEach(function(value, index, array) {
+    var seconds0 = 0; //value;
+    var position0 = value; positionFromSeconds(seconds0);
+    var seconds1 = positionToSeconds(position0);
+    var position1 = positionToString(positionFromSeconds(seconds1));
+    //console.log(seconds0 + ' -> ' + position0 + ' -> ' + seconds1 + ' -> ' + position1);
+  });
+  
 	astralBodies.forEach(function(value, index, array) {
-			var position = positionInputsGet(value.id);
-			calculateData.astralBodiesAnglesSeconds[value.id] = positionToSeconds(position);
-	});
-	
-	// adjust aspects for cusp5 angle
-	var cusp5PositionSeconds = calculateData.auxiliaryBodiesAnglesSeconds["CUSP5"];
-	apectAnglesInSeconds.forEach(function(value, index, array) {
-		var angleInSeconds = value;
-		var adjustedSeconds = positionSecondsWrap(angleInSeconds + cusp5PositionSeconds);
-		calculateData.aspectAnglesSecondsAdjusted.push(adjustedSeconds);
+    //console.log('astralBodies['+index+']');
+			// convert body positions to seconds
+			var bodyPosition = positionInputsGet(value.id);
+			var bodyPositionSeconds = positionToSeconds(bodyPosition);
+			bodyPosition = positionFromSeconds(bodyPositionSeconds);
+			var bodyPositionPretty = positionToString(bodyPosition);
+			$('#name' + value.id).text(bodyPositionPretty);	
 	});
 }
 
-function positionFromString(input) {
-	var position = input.split(':');
+function calculateWinner() {
+	var a;
+  
+  // convert aspect angles into seconds
+	aspectAnglesInSeconds = [];
+	for (a=0; a<aspectAngles.length; a++) {
+		//console.log('aspectAngles['+index+']');
+    var aspectPosition = aspectAngles[a];
+		var aspectPositionSeconds = positionToSeconds(aspectPosition);
+		aspectAnglesInSeconds.push(aspectPositionSeconds);
+	}
+	//console.log('/aspectAngles');
+  
+	// recalculate all data	
+	calculateData = {};
+	
+	// convert auxiliary body positions to seconds
+	calculateData.auxiliaryBodiesAnglesSeconds = {};
+	auxiliaryBodies.forEach(function(value, index, array) {
+  		//console.log('auxiliaryBodies['+index+']');
+			var position = positionInputsGet(value.id);
+      var positionSeconds = positionToSeconds(position);
+			calculateData.auxiliaryBodiesAnglesSeconds[value.id] = positionSeconds;
+	});
+	//console.log('/auxiliaryBodies');
+	
+	// adjust aspects for cusp5 angle
+	var cusp5PositionSeconds = calculateData.auxiliaryBodiesAnglesSeconds["CUSP5"];
+  calculateData.aspectAnglesSecondsAdjusted = [];
+	for (a=0; a<aspectAnglesInSeconds.length; a++) {
+    //console.log('aspectAnglesInSeconds['+a+']');
+		var aspectSeconds = aspectAnglesInSeconds[a];
+		var aspectSecondsAdjusted = aspectSeconds + cusp5PositionSeconds;
+    aspectSecondsAdjusted = positionSecondsWrap(aspectSecondsAdjusted);
+  	calculateData.aspectAnglesSecondsAdjusted.push(aspectSecondsAdjusted);
+	}
+	//console.log('/aspectAnglesInSeconds');
+
+	// process astral bodies
+  //console.log('astralBodies');
+	calculateData.astralBodies = [];
+	astralBodies.forEach(function(value, index, array) {
+      //console.log('astralBodies['+index+']');
+			// convert body positions to seconds
+			var bodyPosition = positionInputsGet(value.id);
+			var bodyPositionSeconds = positionToSeconds(bodyPosition);
+     	// search for closest aspect (adjusted)
+			var a;
+			var closestPosition = 0;
+			var closestPositionDifference = kSecondsPer360Degrees;
+			for (a=0; a < calculateData.aspectAnglesSecondsAdjusted.length; a++) {
+				var aspectPositionSeconds = calculateData.aspectAnglesSecondsAdjusted[a];
+				var aspectDifference = positionSecondsDifference(bodyPositionSeconds, aspectPositionSeconds);
+				if (aspectDifference < closestPositionDifference) {
+					closestPosition = aspectPositionSeconds;
+					closestPositionDifference = aspectDifference;
+				}
+			}
+     	
+			var bodyData = {};
+			bodyData.id = value.id;
+			bodyData.name = value.name;
+			bodyData.positionSeconds = bodyPositionSeconds;
+			bodyData.aspectSecondsDifference = closestPositionDifference;
+			bodyData.aspectSecondsAdjusted = closestPosition;
+			bodyData.aspectSeconds = positionSecondsWrap(closestPosition - cusp5PositionSeconds);
+			bodyData.aspectSecondsMinor = positionSecondsMinor(bodyData.aspectSeconds);
+			calculateData.astralBodies.push(bodyData);
+	});
+
+	//calculateData.astralBodies.sort(function(a,b) {
+	//	return a.aspectSecondsDifference - b.aspectSecondsDifference;
+	//});
+  
+  //console.log('/calculateWinner');  
+}
+
+function winnersPopulate() {
+  //console.log('winnersPopulate');  
+  var table = $("#winnersTable");
+
+  //header
+  var tr = $("<tr></tr>");
+  //var thIcon = $("<th></th>");
+  //var thName = $("<th></th>");
+  var thBody = $("<th>Body</th>");
+  var thDifference = $("<th>Diff</th>");
+  var thAspectMinor = $("<th>Aspect (minor)</th>");
+  tr.append(thBody, thDifference, thAspectMinor);
+  table.append(tr);
+  //console.log('winnersPopulate:/header');  
+
+  //rows
+  //console.log('winnersPopulate:astralBodies');  
+  calculateData.astralBodies.forEach(function(value, index, array) {
+  //console.log('winnersPopulate:astralBodies['+index+']');  
+  	var tr = winnersCreateRow(value.id, value.name, value.aspectSecondsDifference, value.aspectSecondsMinor);
+    //var tr = winnersCreateRow(value.id, value.name, value.positionSeconds, value.aspectSecondsMinor);
+    table.append(tr);
+	});
+
+  //console.log('/winnersPopulate');
+}
+
+function winnersCreateRow(id, name, aspectSecondsDifference, aspectSecondsMinor) {	
+  //console.log('winnersPopulate:winnersCreateRow['+name+']');  
+	var tr = $("<tr></tr>");
+	var thBody = $("<td>" + name + "</td>");
+	var thDifference = $("<td>" + positionToString(positionFromSeconds(aspectSecondsDifference)) + "</td>");
+	var thAspectMinor = $("<td>" + positionToString(positionFromSeconds(aspectSecondsMinor)) + "</td>");
+	tr.append(thBody, thDifference, thAspectMinor);
+  //console.log('winnersPopulate:/winnersCreateRow['+name+']');  
+ 	return tr;
+}
+
+function positionFromString(pretty) {
+	var position = pretty.split(':');
 	while (position.length < 3) {
 		position.unshift(0);
 	}
 	return position;
+}
+
+function positionToString(position) {
+	while (position.length < 3) {
+		position.unshift(0);
+	}
+	var pretty = position.join(':');
+	return pretty;
 }
 
 function positionToSeconds(position) {
@@ -363,22 +518,18 @@ function positionToSeconds(position) {
 		var sign = position[position.length-4];
 		if (sign in zodiacSigns) {
 			var signAngle = zodiacSigns[sign].angle;
+			//console.log('degree: '+degree+' + ' + signAngle+' ('+sign+')');
 			degree += signAngle;
 		}
 	}
 	var minutes = position[position.length-2];
 	var seconds = position[position.length-1];
-	
+  
 	// calculate totals
-	var totalSeconds = 0;
-	totalSeconds += degree; 
-	totalSeconds *= 60;
-	totalSeconds += minutes;
-	totalSeconds *= 60;
-	totalSeconds += seconds;
-	
+	var totalSeconds = degree * kSecondsPerDegree + minutes * kSecondsPerMinute + seconds;
 	// wrap
 	totalSeconds = positionSecondsWrap(totalSeconds);
+	//console.log('['+degree+','+minutes+','+seconds+'] -> ' + totalSeconds)	
 	
 	// return
 	return totalSeconds;
@@ -396,6 +547,31 @@ function positionSecondsWrap(seconds) {
 	}
 	
 	// return
+	return seconds;
+}
+
+function positionSecondsDifference(seconds0, seconds1) {
+	var lowSeconds;
+	var highSeconds;
+	if (seconds0 < seconds1) {
+		lowSeconds = seconds0;
+		highSeconds = seconds1;
+	} else {
+		lowSeconds = seconds1;
+		highSeconds = seconds0;
+	}	
+	var secondsDifference = highSeconds - lowSeconds;
+
+	// make sure we take the shorter of the two angles
+	secondsDifference = positionSecondsMinor(secondsDifference);
+	
+	return secondsDifference;
+}
+
+function positionSecondsMinor(seconds) {
+	if (seconds > kSecondsPer180Degrees) {
+		seconds = kSecondsPer360Degrees - seconds;
+	}	
 	return seconds;
 }
 
