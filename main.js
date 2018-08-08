@@ -218,8 +218,10 @@ function onClickCalculate() {
 	//calculateUnitTest(); return;
   	
 	calculateWinner();
+	debugInfoAstralBodyPopulate();
   winnersPopulate();
-  $("#aspectInputs").hide();
+  
+  //$("#aspectInputs").hide();
   $("#aspectResults").show();
 }
 
@@ -271,7 +273,7 @@ function positionInputsPopulate() {
 }
 
 function positionInputsCreateRow(id, name, icon) {	
-	var tr = $("<tr></tr>");
+	var tr = $('<tr id="row' + id + '">' + name + '</tr>');
 	var tdIcon = $(
 		'<td><img id="icon' + id + '" src="' + icon + '"></img></td>'
 	);
@@ -461,6 +463,30 @@ function calculateWinner() {
   //console.log('/calculateWinner');  
 }
 
+function debugInfoAstralBodyPopulate() {
+  var table = $("#positionInputs");
+	var header = table.find("th").first().parent();
+	if (header !== undefined) {
+		var $th = $('<th>bodyPos</th>');
+		header.append($th);
+		//header.append('<th>aspectDifference</th>');
+		header.append('<th>aspectAdjusted</th>');
+		header.append('<th>aspect</th>');
+		header.append('<th>aspectMinor</th>');
+	}
+	
+	var a;
+	for (a=0; a < calculateData.astralBodies.length; ++a) {
+		var bodyData = calculateData.astralBodies[a];
+		var bodyRow = $('#row' + bodyData.id);
+		bodyRow.append($('<td>' + stringFromSeconds(bodyData.positionSeconds) + '</td>'));
+		//bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsDifference) + '</td>'));
+		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsAdjusted) + '</td>'));
+		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSeconds) + '</td>'));
+		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsMinor) + '</td>'));
+	}
+}
+
 function winnersPopulate() {
   //console.log('winnersPopulate');  
   var table = $("#winnersTable");
@@ -497,6 +523,12 @@ function winnersCreateRow(id, name, aspectSecondsDifference, aspectSecondsMinor)
 	tr.append(thBody, thDifference, thAspectMinor);
   //console.log('winnersPopulate:/winnersCreateRow['+name+']');  
  	return tr;
+}
+
+function stringFromSeconds(seconds) {
+	var position = positionFromSeconds(seconds);
+	var pretty = positionToString(position);
+	return pretty;
 }
 
 function positionFromString(pretty) {
