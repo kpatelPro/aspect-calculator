@@ -1,3 +1,10 @@
+// CONSTANTS
+var kSecondsPerMinute = 60;
+var kSecondsPerDegree = 1 * 60 * 60;
+var kSecondsPer180Degrees = 180 * 60 * 60;
+var kSecondsPer360Degrees = 360 * 60 * 60;
+
+// TABLE DATA
 var zodiacKeys = [
   "ARI",
   "TAU",
@@ -117,6 +124,14 @@ var astralBodies = [
     icon:
       "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-pluto.png"
   },
+  {
+    id: "Chiron",
+    name: "Chiron",
+    today: "2:21:42",
+    tomorrow: "2:21:04",
+    icon:
+      "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-chiron.png"
+  },
 /*
   {
     id: "MeanNode",
@@ -134,14 +149,6 @@ var astralBodies = [
     icon:
       "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-true-node.png"
   },
-  {
-    id: "Chiron",
-    name: "Chiron",
-    today: "2:21:42",
-    tomorrow: "2:21:04",
-    icon:
-      "http://www.antmandesign.com/portfolio/aspectcalculator/images/glyph-planet-chiron.png"
-  }
 */
 ];
 
@@ -161,17 +168,6 @@ var aspectAngles = [
 
 var aspectAnglesInSeconds = [];
 
-var kSecondsPerMinute = 60;
-var kSecondsPerDegree = 1 * 60 * 60;
-var kSecondsPer180Degrees = 180 * 60 * 60;
-var kSecondsPer360Degrees = 360 * 60 * 60;
-
-var calculateData = {
-	auxiliaryBodiesAnglesSeconds : {},
-	astralBodiesAnglesSeconds : {},
-	aspectAnglesSecondsAdjusted : [],
-};
-
 // TEST DATA
 var testData_0 = {
 	CUSP5: 		{ sign: "PIS", position: [28,46,0] },
@@ -189,6 +185,13 @@ var testData_0 = {
 	Asteroid2:{ sign: "PIS", position: [0,0,0] },
 }
 
+// RUNTIME DATA
+var calculateData = {
+	auxiliaryBodiesAnglesSeconds : {},
+	aspectAnglesSecondsAdjusted : [],
+	astralBodies : [],
+};
+
 function onReady() {
 	zodiacSignsPrecalculate();
   //astralBodyPrecalculate();
@@ -198,8 +201,11 @@ function onReady() {
   $("#aspectResults").hide();
   
   // button handlers
-	$("#random").click(function(){
-		onClickRandom();
+	$("#randomData").click(function(){
+		onClickRandomData();
+  });
+	$("#testData").click(function(){
+		onClickTestData();
   });
   $("#calculate").click(function(){
   	onClickCalculate();
@@ -209,23 +215,31 @@ function onReady() {
   });
 }
 
-function onClickRandom() {
+function onClickRandomData() {
+	positionInputsRandomize();
+}
+
+function onClickTestData() {
 	positionInputsToTest(testData_0);
-	//positionInputsRandomize();
 }
 
 function onClickCalculate() {
 	//calculateUnitTest(); return;
-  	
+ 
 	calculateWinner();
-	debugInfoAstralBodyPopulate();
-  winnersPopulate();
   
-  //$("#aspectInputs").hide();
+  if ($("#showDebugData").is(':checked')) {
+		debugInfoAstralBodyPopulate();
+	} else {
+  	$("#aspectInputs").hide();
+  }
+  
+  winnersPopulate();
   $("#aspectResults").show();
 }
 
 function onClickChangeInputs() {
+	debugInfoAstralBodyClear();
   $("#aspectInputs").show();
   $("#aspectResults").hide();
 }
@@ -399,6 +413,7 @@ return;
 }
 
 function calculateWinner() {
+	//console.log("calculateWinner()");
 	var a;
   
   // convert aspect angles into seconds
@@ -425,9 +440,9 @@ function calculateWinner() {
 	//console.log('/auxiliaryBodies');
 	
 	// adjust aspects for cusp5 angle
+  calculateData.aspectAnglesSecondsAdjusted = [];
 	var cusp5PositionSeconds = calculateData.auxiliaryBodiesAnglesSeconds["CUSP5"];
   console.log('CUSP5 position: ('+cusp5PositionSeconds+') ' + stringFromSeconds(cusp5PositionSeconds));
-  calculateData.aspectAnglesSecondsAdjusted = [];
 	for (a=0; a<aspectAnglesInSeconds.length; a++) {
     //console.log('aspectAnglesInSeconds['+a+']');
 		var aspectSeconds = aspectAnglesInSeconds[a];
@@ -475,12 +490,33 @@ function calculateWinner() {
 		return a.aspectSecondsDifference - b.aspectSecondsDifference;
 	});
   
-  //console.log('/calculateWinner');  
+  //console.log('/calculateWinner()');  
 }
 
+function debugInfoAstralBodyClear() {
+  var table = $("#positionInputs");
+  
+	var header = table.find("th").first().parent();	
+	if (header !== undefined) {
+		header.children("th:gt(4)").remove();
+	}
+	
+	var a;
+	if (calculateData !== undefined) {
+		if (calculateData.astralBodies !== undefined) {
+			for (a=0; a < calculateData.astralBodies.length; ++a) {
+				var bodyData = calculateData.astralBodies[a];
+				var bodyRow = $('#row' + bodyData.id);
+				bodyRow.children("td:gt(4)").remove();
+			}
+		}
+	}
+}
+		
 function debugInfoAstralBodyPopulate() {
   var table = $("#positionInputs");
 	var header = table.find("th").first().parent();
+	
 	if (header !== undefined) {
 		var $th = $('<th>bodyPos</th>');
 		header.append($th);
@@ -503,8 +539,9 @@ function debugInfoAstralBodyPopulate() {
 }
 
 function winnersPopulate() {
-  //console.log('winnersPopulate');  
+  //console.log('winnersPopulate()');  
   var table = $("#winnersTable");
+	table.empty();
 
   //header
   var tr = $("<tr></tr>");
@@ -526,7 +563,7 @@ function winnersPopulate() {
     table.append(tr);
 	});
 
-  //console.log('/winnersPopulate');
+  //console.log('/winnersPopulate()');
 }
 
 function winnersCreateRow(id, name, aspectSecondsDifference, aspectSecondsMinor) {	
