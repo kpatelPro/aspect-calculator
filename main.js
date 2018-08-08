@@ -536,6 +536,11 @@ function positionFromString(pretty) {
 	while (position.length < 3) {
 		position.unshift(0);
 	}
+	// convert to numbers
+	var p;
+	for (p=position.length-1; p>=position.length-3; --p) {
+		position[p] = +(position[p]);
+	}
 	return position;
 }
 
@@ -543,7 +548,16 @@ function positionToString(position) {
 	while (position.length < 3) {
 		position.unshift(0);
 	}
-	var pretty = position.join(':');
+	// convert to string
+	var pretty = position[0];
+	var p;
+	for (p=1; p<position.length; ++p) {
+		pretty += ':';
+		if (position[p] < 10) {
+			pretty += '0';
+		}
+		pretty += position[p];
+	}
 	return pretty;
 }
 
