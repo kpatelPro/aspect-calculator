@@ -199,21 +199,33 @@ function onReady() {
   
   // button handlers
 	$("#random").click(function(){
-		positionInputsToTest(testData_0);
-		//positionInputsRandomize();
+		onClickRandom();
   });
   $("#calculate").click(function(){
-  	//calculateUnitTest(); return;
-  	
-  	calculateWinner();
-    winnersPopulate();
-    $("#aspectInputs").hide();
-    $("#aspectResults").show();
+  	onClickCalculate();
   });
   $("#changeInputs").click(function(){
-    $("#aspectInputs").show();
-    $("#aspectResults").hide();
+  	onClickChangeInputs();
   });
+}
+
+function onClickRandom() {
+	positionInputsToTest(testData_0);
+	//positionInputsRandomize();
+}
+
+function onClickCalculate() {
+	//calculateUnitTest(); return;
+  	
+	calculateWinner();
+  winnersPopulate();
+  $("#aspectInputs").hide();
+  $("#aspectResults").show();
+}
+
+function onClickChangeInputs() {
+  $("#aspectInputs").show();
+  $("#aspectResults").hide();
 }
 
 function zodiacSignsPrecalculate() {
