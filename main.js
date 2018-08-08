@@ -301,7 +301,7 @@ function positionInputsGet(id) {
 		var degrees = +$('#offsetDegrees' + id).val();
 		var minutes = +$('#offsetMinutes' + id).val();
 		var seconds = +$('#offsetSeconds' + id).val();
-		var position = [degrees, minutes, seconds];
+		var position = [sign, degrees, minutes, seconds];
 		//console.log(id + '- ' + sign + ' ' + degrees + ':' + minutes + ':' + seconds);
     return position;
 }
@@ -366,15 +366,27 @@ function positionInputsRandomizeRow(id) {
 }
 
 function calculateUnitTest() {
-	//[30, 90, 30*60, 90*60, 30*60*60, 90*60*60];
-  [[0,1,30]].forEach(function(value, index, array) {
-    var seconds0 = 0; //value;
-    var position0 = value; positionFromSeconds(seconds0);
+  var a;
+  for (a=0; a<aspectAngles.length; ++a) {
+    console.log(aspectAngles[a] + ':' + positionToString(aspectAngles[a]));
+  }
+return;
+  var i;
+  for (i=0; i<32; ++i) {
+    var seconds0 = randomRangeInt(0, kSecondsPer360Degrees-1);
+  	console.log(i+':'+seconds0);
+    var position0 = positionFromSeconds(seconds0);
     var seconds1 = positionToSeconds(position0);
-    var position1 = positionToString(positionFromSeconds(seconds1));
-    //console.log(seconds0 + ' -> ' + position0 + ' -> ' + seconds1 + ' -> ' + position1);
-  });
+    var position1 = positionFromSeconds(seconds1);
+    var string0 = positionToString(position1);
+    var position2 = positionFromString(string0);
+    var seconds2 = positionToSeconds(position2);
+    if (seconds0 != seconds2) {
+    	console.log([seconds0, position0, seconds1, position1, string0, position2, seconds2].join('\n'));
+    }
+  }
   
+return;
 	astralBodies.forEach(function(value, index, array) {
     //console.log('astralBodies['+index+']');
 			// convert body positions to seconds
@@ -414,6 +426,7 @@ function calculateWinner() {
 	
 	// adjust aspects for cusp5 angle
 	var cusp5PositionSeconds = calculateData.auxiliaryBodiesAnglesSeconds["CUSP5"];
+  console.log('CUSP5 position: ('+cusp5PositionSeconds+') ' + stringFromSeconds(cusp5PositionSeconds));
   calculateData.aspectAnglesSecondsAdjusted = [];
 	for (a=0; a<aspectAnglesInSeconds.length; a++) {
     //console.log('aspectAnglesInSeconds['+a+']');
@@ -451,14 +464,16 @@ function calculateWinner() {
 			bodyData.positionSeconds = bodyPositionSeconds;
 			bodyData.aspectSecondsDifference = closestPositionDifference;
 			bodyData.aspectSecondsAdjusted = closestPosition;
-			bodyData.aspectSeconds = positionSecondsWrap(closestPosition - cusp5PositionSeconds);
-			bodyData.aspectSecondsMinor = positionSecondsMinor(bodyData.aspectSeconds);
+			bodyData.aspectSeconds = closestPosition - cusp5PositionSeconds;
+			bodyData.aspectSeconds = positionSecondsWrap(bodyData.aspectSeconds);
+			bodyData.aspectSecondsMinor = bodyData.aspectSeconds;
+			bodyData.aspectSecondsMinor = positionSecondsMinor(bodyData.aspectSecondsMinor);
 			calculateData.astralBodies.push(bodyData);
 	});
 
-	//calculateData.astralBodies.sort(function(a,b) {
-	//	return a.aspectSecondsDifference - b.aspectSecondsDifference;
-	//});
+	calculateData.astralBodies.sort(function(a,b) {
+		return a.aspectSecondsDifference - b.aspectSecondsDifference;
+	});
   
   //console.log('/calculateWinner');  
 }
@@ -469,7 +484,7 @@ function debugInfoAstralBodyPopulate() {
 	if (header !== undefined) {
 		var $th = $('<th>bodyPos</th>');
 		header.append($th);
-		//header.append('<th>aspectDifference</th>');
+		header.append('<th>aspectDifference</th>');
 		header.append('<th>aspectAdjusted</th>');
 		header.append('<th>aspect</th>');
 		header.append('<th>aspectMinor</th>');
@@ -480,7 +495,7 @@ function debugInfoAstralBodyPopulate() {
 		var bodyData = calculateData.astralBodies[a];
 		var bodyRow = $('#row' + bodyData.id);
 		bodyRow.append($('<td>' + stringFromSeconds(bodyData.positionSeconds) + '</td>'));
-		//bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsDifference) + '</td>'));
+		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsDifference) + '</td>'));
 		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsAdjusted) + '</td>'));
 		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSeconds) + '</td>'));
 		bodyRow.append($('<td>' + stringFromSeconds(bodyData.aspectSecondsMinor) + '</td>'));
@@ -655,8 +670,7 @@ function positionFromSeconds(totalSeconds) {
 	return position;
 }
 
-function randomRangeInt(min, max)
-{
+function randomRangeInt(min, max) {
 	return min + Math.floor(Math.random()*(max-min));
 }
 
