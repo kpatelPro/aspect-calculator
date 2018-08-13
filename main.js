@@ -564,7 +564,7 @@ function winnersPopulate() {
   //var thName = $("<th></th>");
   var thBody = $("<th>Body</th>");
   var thDifference = $("<th>Diff</th>");
-  var thAspectMinor = $("<th>Aspect (minor)</th>");
+  var thAspectMinor = $("<th>Aspect</th>");
   tr.append(thBody, thDifference, thAspectMinor);
   table.append(tr);
   //console.log('winnersPopulate:/header');  

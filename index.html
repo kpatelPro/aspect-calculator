@@ -8,6 +8,19 @@
       onReady();
     });
   </script>
+  <style>
+    table {
+      border: solid black 1px;
+    }
+    td {
+      text-align: right;
+    }
+    #winnersTable th, td {
+      text-align: right;
+      padding: 0px 5px 0px 5px;
+    }
+  </style>
+  
 </head>
 
 <body>
@@ -24,11 +37,6 @@
       <option value="aspectClosest">Closest</option>"
       <option value="aspectSeparating" selected>Separating Only</option>"
    </select>
-   <!--
-   <input type="radio" name="aspectDifference" value="aspectApproaching" checked> 
-   <input type="radio" name="aspectDifference" value="aspectClosest"> 
-   <input type="radio" name="aspectDifference" value="aspectSeparating"> 
-   --!>
    <br/>
    <button id="calculate" type="submit">Calculate!</button>
    <br/>
