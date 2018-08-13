@@ -14,13 +14,26 @@
   <h1 class="text-primary">Aspect Calculator</h1>
 
   <div id="aspectInputs" class="container-fluid">
-   <button id="randomData">Fill with Random Data</button>
-   <button id="testData">Fill From Test Data</button>
-   <div></div>
-   <input id="showDebugData" type="checkbox">Show Debug Data</button>
-   <div></div>
+   Fill with 
+   <button id="randomData">Random Data</button>
+   <button id="testData">Test Data</button>
+   <br/>
+   Aspect Mode
+   <select id="aspectMode" required>
+      <option value="aspectApproaching">Approaching Only</option>"
+      <option value="aspectClosest">Closest</option>"
+      <option value="aspectSeparating" selected>Separating Only</option>"
+   </select>
+   <!--
+   <input type="radio" name="aspectDifference" value="aspectApproaching" checked> 
+   <input type="radio" name="aspectDifference" value="aspectClosest"> 
+   <input type="radio" name="aspectDifference" value="aspectSeparating"> 
+   --!>
+   <br/>
    <button id="calculate" type="submit">Calculate!</button>
-   <div></div>
+   <br/>
+   <input id="showDebugData" type="checkbox">Show Debug Data</button>
+   <br/>
     <form action="/url-where-you-want-to-submit-form-data">
       <table id="positionInputs">
       </table>

@@ -455,6 +455,7 @@ function calculateWinner() {
 	// process astral bodies
   //console.log('astralBodies');
 	calculateData.astralBodies = [];
+	var aspectDifferenceFunction = getAspectDifferenceFunction();
 	astralBodies.forEach(function(value, index, array) {
       //console.log('astralBodies['+index+']');
 			// convert body positions to seconds
@@ -466,7 +467,7 @@ function calculateWinner() {
 			var closestPositionDifference = kSecondsPer360Degrees;
 			for (a=0; a < calculateData.aspectAnglesSecondsAdjusted.length; a++) {
 				var aspectPositionSeconds = calculateData.aspectAnglesSecondsAdjusted[a];
-				var aspectDifference = positionSecondsDifference(bodyPositionSeconds, aspectPositionSeconds);
+				var aspectDifference = aspectDifferenceFunction(bodyPositionSeconds, aspectPositionSeconds);
 				if (aspectDifference < closestPositionDifference) {
 					closestPosition = aspectPositionSeconds;
 					closestPositionDifference = aspectDifference;
@@ -493,6 +494,20 @@ function calculateWinner() {
   //console.log('/calculateWinner()');  
 }
 
+function getAspectDifferenceFunction() {
+	var aspectDifferenceFunction;
+	if ($("#aspectMode").val() == "aspectApproaching") {
+	  aspectDifferenceFunction = positionSecondsDifferenceApproaching;
+	}
+	if ($("#aspectMode").val() == "aspectClosest") {
+	  aspectDifferenceFunction = positionSecondsDifferenceClosest;
+	}
+	if ($("#aspectMode").val() == "aspectSeparating") {
+	  aspectDifferenceFunction = positionSecondsDifferenceSeparating;
+	}
+	return aspectDifferenceFunction;
+}
+	
 function debugInfoAstralBodyClear() {
   var table = $("#positionInputs");
   
@@ -660,7 +675,27 @@ function positionSecondsWrap(seconds) {
 	return seconds;
 }
 
-function positionSecondsDifference(seconds0, seconds1) {
+function positionSecondsDifferenceApproaching(bodySeconds, aspectSeconds) {
+	// check if out of order
+	if (bodySeconds > aspectSeconds) {
+		aspectSeconds += kSecondsPer360Degrees;
+	}
+
+	var secondsDifference = aspectSeconds - bodySeconds;
+	return secondsDifference;
+}
+
+function positionSecondsDifferenceSeparating(bodySeconds, aspectSeconds) {
+	// check if out of order
+	if (aspectSeconds > bodySeconds) {
+		bodySeconds += kSecondsPer360Degrees;
+	}
+
+	var secondsDifference = bodySeconds - aspectSeconds;
+	return secondsDifference;
+}
+
+function positionSecondsDifferenceClosest(seconds0, seconds1) {
 	var lowSeconds;
 	var highSeconds;
 	if (seconds0 < seconds1) {
